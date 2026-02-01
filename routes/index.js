@@ -3,7 +3,7 @@ const path = require('path');
 const router = express.Router();
 
 // SENHA HARDCODED
-const SENHA_SECRETA = "1234";
+const SENHA_SECRETA = "Dm-290615";
 
 // Rota da tela de Login (GET)
 router.get('/', (req, res) => {
