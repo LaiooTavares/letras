@@ -1,0 +1,238 @@
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: radial-gradient(circle at top, #141e30, #000000);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* O "Card" central */
+.container {
+    background-color: #0f131f;
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid #1f2a40;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Títulos */
+h3 { margin-bottom: 5px; color: #fff; letter-spacing: 1px; }
+.subtitle { font-size: 0.9rem; color: #8a9bbd; margin-bottom: 20px; }
+
+/* === BARRA DE FERRAMENTAS 3D === */
+.toolbar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    background: #181f2e;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #2a344a;
+}
+
+.btn-3d {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    color: #333;
+    position: relative;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.btn-3d:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+/* Cores */
+.btn-yellow { background: linear-gradient(to bottom, #ffd700, #ffb700); box-shadow: 0 4px 0 #b38600; }
+.btn-red { background: linear-gradient(to bottom, #ff5e5e, #ff0000); box-shadow: 0 4px 0 #a60000; color: white; }
+.btn-green { background: linear-gradient(to bottom, #5eff5e, #00cc00); box-shadow: 0 4px 0 #008000; }
+.btn-cyan { background: linear-gradient(to bottom, #5effff, #00cccc); box-shadow: 0 4px 0 #008080; }
+
+/* Formatação (B, I, U) */
+.btn-format {
+    background: linear-gradient(to bottom, #ffffff, #dcdcdc);
+    box-shadow: 0 4px 0 #999999;
+    color: #333;
+    font-family: 'Times New Roman', serif;
+    font-size: 1.1rem;
+    min-width: 40px;
+}
+
+/* Botões de Alinhamento (Novos) */
+.btn-align {
+    background: linear-gradient(to bottom, #44ccff, #0088cc);
+    box-shadow: 0 4px 0 #005580;
+    color: white;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Inputs */
+label {
+    display: block;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #2a344a;
+    background: #181f2e;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    height: 120px;
+    resize: none;
+    font-family: monospace;
+}
+textarea:focus { border-color: #4e44ff; }
+
+/* Botão Principal */
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to bottom, #6a5acd, #483d8b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #312a5e;
+    transition: transform 0.1s;
+    margin-bottom: 10px;
+}
+.btn-primary:active { transform: translateY(5px); box-shadow: 0 0 0 #312a5e; }
+
+.btn-logout {
+    background: transparent;
+    color: #8a9bbd;
+    border: 1px solid #2a344a;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    width: 100%;
+    transition: all 0.3s;
+}
+.btn-logout:hover { background: #1f2a40; color: #fff; border-color: #fff; }
+
+/* === TELA CHEIA E MODO VERTICAL === */
+#presentation-layer {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: black;
+    z-index: 9999;
+    padding: 0;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+}
+
+#display-text {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    padding: 20px;
+    max-width: 90%;
+    line-height: 1.3;
+    text-align: center; /* Padrão desktop */
+}
+
+/* Classes utilitárias para o Javascript injetar alinhamento */
+.align-center { text-align: center !important; display: block; }
+.align-justify { text-align: justify !important; display: block; }
+
+/* ... MANTENHA TODO O RESTO DO ARQUIVO IGUAL ... */
+
+/* === AJUSTE MOBILE CORRIGIDO (PREENCHIMENTO TOTAL) === */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+    /* Esconde a estrutura padrão do container pai para não interferir */
+    #presentation-layer {
+        display: none; 
+        align-items: unset;
+        justify-content: unset;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #display-text {
+        /* FIXED garante que ele ignore o container pai e use a janela inteira */
+        position: fixed; 
+        top: 50%;
+        left: 50%;
+        
+        /* Gira 90 graus */
+        transform: translate(-50%, -50%) rotate(90deg);
+        
+        /* AQUI ESTÁ A CORREÇÃO:
+           1. width: 100vh -> Obriga a caixa de texto ter a altura TOTAL do celular.
+           2. max-width: none -> Remove limites que o desktop impõe. */
+        width: 100vh;
+        max-width: none !important;
+        height: auto;
+        
+        /* Padding: 0 nas laterais (que viram altura) e 4vh nas pontas (topo/fundo do cel)
+           Isso é a margem de segurança para a câmera/notch */
+        padding: 0 4vh; 
+        
+        /* Tamanho da fonte calibrado para encher bem */
+        font-size: 10vw; 
+        line-height: 1.2; 
+        
+        text-align: center;
+        margin: 0;
+        white-space: normal;
+        
+        /* Garante que o padding não aumente o tamanho total */
+        box-sizing: border-box; 
+    }
+    
+    /* Ajuste para as tags de alinhamento funcionarem no modo girado */
+    .align-center { text-align: center; display: block; }
+    
+    /* No Justify do mobile, usamos text-align-last center para a última linha não ficar feia */
+    .align-justify { 
+        text-align: justify; 
+        text-align-last: center; 
+        display: block; 
+    }
+}

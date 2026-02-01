@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - App Frases</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: #4e44ff; font-weight: 800; margin-bottom: 5px; text-shadow: 0 0 15px rgba(78,68,255,0.5);">APP FRASES</h1>
+        
+        <h2>Bem-vindo</h2>
+        <p class="subtitle">Acesse para gerenciar suas frases</p>
+        
+        <form action="/login" method="POST">
+            <label for="senha">Senha de Acesso</label>
+            <input type="password" id="senha" name="senha" placeholder="••••••••" required>
+            
+            <button type="submit" class="btn-primary">ENTRAR</button>
+        </form>
+    </div>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('erro')) alert("Senha incorreta!");
+    </script>
+</body>
+</html>

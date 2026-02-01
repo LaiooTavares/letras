@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Frases</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <div class="container" id="editor-view">
+        <h3>Editor de Frases</h3>
+        <p class="subtitle">Selecione o texto e clique no efeito desejado</p>
+        
+        <div class="toolbar">
+            <button type="button" class="btn-3d btn-yellow btn-insert" data-tag="yellow">Amarelo</button>
+            <button type="button" class="btn-3d btn-red btn-insert" data-tag="red">Vermelho</button>
+            <button type="button" class="btn-3d btn-green btn-insert" data-tag="green">Verde</button>
+            <button type="button" class="btn-3d btn-cyan btn-insert" data-tag="cyan">Ciano</button>
+            
+            <div style="width: 100%; height: 5px;"></div>
+
+            <button type="button" class="btn-3d btn-format btn-insert" data-tag="b" title="Negrito"><b>B</b></button>
+            <button type="button" class="btn-3d btn-format btn-insert" data-tag="i" title="Itálico"><i>I</i></button>
+            <button type="button" class="btn-3d btn-format btn-insert" data-tag="u" title="Sublinhado"><u>U</u></button>
+
+            <button type="button" class="btn-3d btn-align btn-insert" data-tag="c" title="Centralizar">
+                CENTRO
+            </button>
+            <button type="button" class="btn-3d btn-align btn-insert" data-tag="j" title="Estender Texto">
+                ESTENDER
+            </button>
+        </div>
+
+        <label>Texto da Apresentação</label>
+        <textarea id="text-input" placeholder="Exemplo:&#10;[c]Título Centralizado[/c]&#10;[j]Texto estendido até as bordas[/j]&#10;Jesus é o [yellow]Caminho[/yellow]"></textarea>
+        
+        <button id="btn-start" class="btn-primary">INICIAR TELA CHEIA</button>
+        <button id="btn-logout" class="btn-logout">Sair do App</button>
+    </div>
+
+    <div id="presentation-layer">
+        <div id="display-text">Carregando...</div>
+        <div style="position:absolute; bottom:30px; font-size: 0.8rem; opacity: 0.5; color: white; text-align: center; width: 100%;">
+            Deslize ⬆ p/ avançar | Deslize ⬇ p/ voltar | Duplo toque sai
+        </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
