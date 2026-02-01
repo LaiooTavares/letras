@@ -13,8 +13,13 @@
     <link rel="manifest" href="/manifest.json">
     
     <meta name="theme-color" content="#000000">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="apple-touch-icon" href="/img/icon-192.png">
 </head>
 <body>
     <div class="container">
@@ -46,20 +51,20 @@
 
         // 1. Escuta se o navegador autoriza a instalação
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); // Impede o popup padrão feio
-            deferredPrompt = e; // Salva o evento
-            installBtn.style.display = 'block'; // Mostra nosso botão personalizado
+            e.preventDefault(); // Impede o popup padrão feio do navegador
+            deferredPrompt = e; // Salva o evento para usar no clique
+            installBtn.style.display = 'block'; // Torna o botão visível
             console.log('App pronto para instalar!');
         });
 
         // 2. O que acontece ao clicar no botão Instalar
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                deferredPrompt.prompt(); // Mostra a pergunta do sistema
-                const { outcome } = await deferredPrompt.userChoice; // Espera a resposta
+                deferredPrompt.prompt(); // Mostra a pergunta oficial do sistema
+                const { outcome } = await deferredPrompt.userChoice; // Espera a resposta do usuário
                 console.log(`Usuário escolheu: ${outcome}`);
-                deferredPrompt = null; // Limpa
-                installBtn.style.display = 'none'; // Esconde o botão
+                deferredPrompt = null; // Limpa a variável
+                installBtn.style.display = 'none'; // Esconde o botão após a ação
             }
         });
 
@@ -68,10 +73,10 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
                     .then(reg => {
-                        console.log('SW Registrado na versão 2');
-                        reg.update(); // Tenta atualizar o cache imediatamente
+                        console.log('SW Registrado com sucesso.');
+                        reg.update(); // Tenta atualizar o cache imediatamente para pegar mudanças
                     })
-                    .catch(err => console.log('Erro no SW:', err));
+                    .catch(err => console.log('Erro ao registrar SW:', err));
             });
         }
     </script>
