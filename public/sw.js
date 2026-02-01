@@ -1,36 +1,36 @@
-// ATENÇÃO: Mudei para v2 para forçar a atualização do design no celular do usuário
-const CACHE_NAME = 'app-frases-v2';
+// Mudei para v3 para obrigar o celular a atualizar esse arquivo
+const CACHE_NAME = 'app-frases-v3';
 
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/app.html',
+  // Não cacheamos mais o app.html dinâmico para evitar bugs de versão
   '/css/style.css',
   '/js/script.js',
   '/manifest.json',
+  '/img/icon-192.png', // Certifique-se que as imagens existem
+  '/img/icon-512.png',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap'
 ];
 
-// 1. Instalação: Baixa os arquivos para deixar offline
+// 1. Instalação
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Instalando v2...');
+  console.log('[SW] Instalando v3...');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting(); // Força a ativação imediata
+  self.skipWaiting();
 });
 
-// 2. Ativação: Limpa a versão antiga (v1) para não mostrar o design velho
+// 2. Ativação (Limpeza de caches antigos)
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Ativando e limpando caches antigos...');
   event.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[Service Worker] Removendo cache:', key);
             return caches.delete(key);
           }
         })
@@ -40,13 +40,23 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 3. Busca: Tenta o Cache primeiro, se não tiver, vai na Internet
+// 3. Interceptação (AQUI ESTÁ A CORREÇÃO DE SINCRONIA)
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
-    })
-  );
+  // REGRA DE OURO: Se for uma chamada para a API (/api/...), 
+  // NUNCA use o cache. Vá sempre na rede (Network Only).
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Para o resto (CSS, JS, Imagens), usa a estratégia Cache First
+  if (event.request.method === 'GET') {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return cachedResponse || fetch(event.request);
+      })
+    );
+  }
 });

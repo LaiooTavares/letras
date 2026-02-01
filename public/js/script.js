@@ -1,44 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- ELEMENTOS DO DOM ---
     const btnStart = document.getElementById('btn-start');
     const textInput = document.getElementById('text-input'); 
     const presentationLayer = document.getElementById('presentation-layer');
     const displayText = document.getElementById('display-text');
     const btnLogout = document.getElementById('btn-logout');
     
-    // Novos Elementos para Templates
+    // Elementos de Templates
     const btnSaveTemplate = document.getElementById('btn-save-template');
     const templateListEl = document.getElementById('template-list');
 
-    // Seleciona botões de inserção
+    // Botões de Inserção (Toolbar)
     const insertButtons = document.querySelectorAll('.btn-insert');
 
+    // --- VARIÁVEIS DE CONTROLE ---
     let phrases = [];
     let currentIndex = 0;
     let touchStartY = 0;
     let touchEndY = 0;
     let saveTimeout;
+    
+    // Variável para evitar recarregar a lista se eu estiver digitando
+    let isEditing = false;
 
-    // === 1. SISTEMA DE DADOS (AUTO-SAVE + TEMPLATES) ===
+    // === 1. CARREGAMENTO E SINCRONIA DE DADOS ===
 
-    async function carregarDadosIniciais() {
+    async function carregarDados(apenasLista = false) {
         try {
-            const response = await fetch('/api/dados');
+            // Adiciona timestamp para evitar cache forçado do navegador
+            const response = await fetch(`/api/dados?t=${Date.now()}`);
             const data = await response.json();
             
-            // 1. Carrega o texto que estava sendo editado (Auto-Save)
-            if (data.conteudo && textInput) {
-                textInput.value = data.conteudo;
+            // Se for carregamento inicial, preenche o texto
+            if (!apenasLista && data.conteudo && textInput) {
+                // Só atualiza o texto principal se não estiver vazio
+                if(textInput.value === "") textInput.value = data.conteudo;
             }
 
-            // 2. Renderiza a lista de modelos salvos
+            // Atualiza a lista de templates
             renderizarTemplates(data.templates || []);
 
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
+            console.error('Erro de conexão:', error);
         }
     }
 
-    // Função para salvar APENAS o texto atual (Auto-Save invisível)
+    // Auto-Save do Texto Principal
     async function autoSave() {
         if(!textInput) return;
         const texto = textInput.value;
@@ -48,62 +55,99 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ texto: texto })
             });
-            console.log('✅ Auto-save ok.');
+            console.log('✅ Sincronizado.');
         } catch (error) {
-            console.error('Erro no auto-save:', error);
+            console.error('Erro ao salvar:', error);
         }
+        isEditing = false;
     }
 
-    // === 2. GERENCIADOR DE TEMPLATES (MODELOS) ===
+    // === ATIVAÇÃO DA SINCRONIA AUTOMÁTICA ===
+    // 1. Carrega tudo ao abrir
+    if (textInput) {
+        carregarDados(false); 
 
-    // Função visual para mostrar a lista
-    function renderizarTemplates(lista) {
-        if (!templateListEl) return;
-        templateListEl.innerHTML = '';
+        // 2. A cada 5 segundos, busca novos modelos criados em outros dispositivos
+        setInterval(() => {
+            // Só atualiza a lista em background, não mexe no texto que você está digitando
+            carregarDados(true); 
+        }, 5000);
 
-        if (lista.length === 0) {
-            templateListEl.innerHTML = '<p style="font-size: 0.8rem; color: #666; text-align:center;">Nenhum modelo salvo.</p>';
-            return;
-        }
-
-        lista.forEach(template => {
-            const div = document.createElement('div');
-            div.className = 'template-item';
-            div.innerHTML = `
-                <span class="template-name">📄 ${template.nome}</span>
-                <div>
-                    <button class="btn-action-sm btn-load">Carregar</button>
-                    <button class="btn-action-sm btn-delete">🗑️</button>
-                </div>
-            `;
-
-            // Botão Carregar
-            div.querySelector('.btn-load').addEventListener('click', () => {
-                if(confirm(`Substituir texto atual pelo modelo "${template.nome}"?`)) {
-                    textInput.value = template.conteudo;
-                    autoSave(); // Salva o novo estado
-                }
-            });
-
-            // Botão Deletar
-            div.querySelector('.btn-delete').addEventListener('click', () => {
-                if(confirm(`Apagar o modelo "${template.nome}"?`)) {
-                    deletarTemplate(template.id);
-                }
-            });
-
-            templateListEl.appendChild(div);
+        // 3. Gatilho de digitação
+        textInput.addEventListener('input', () => {
+            isEditing = true;
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(autoSave, 1000);
         });
     }
 
-    // Ação do Botão "Salvar Modelo"
+    // === 2. GERENCIADOR DE TEMPLATES ===
+
+    function renderizarTemplates(lista) {
+        if (!templateListEl) return;
+        
+        // Verifica se a lista mudou antes de redesenhar (para não piscar a tela)
+        const currentHTML = templateListEl.innerHTML;
+        
+        // Cria o HTML na memória primeiro
+        if (lista.length === 0) {
+            if(!currentHTML.includes('Nenhum modelo')) {
+                templateListEl.innerHTML = '<p style="font-size: 0.8rem; color: #666; text-align:center;">Nenhum modelo salvo.</p>';
+            }
+            return;
+        }
+
+        // Ordena: mais recentes primeiro (baseado no ID timestamp)
+        lista.sort((a, b) => b.id - a.id);
+
+        let html = '';
+        lista.forEach(template => {
+            html += `
+                <div class="template-item">
+                    <span class="template-name" onclick="carregarModelo(${template.id})">📄 ${template.nome}</span>
+                    <div>
+                        <button class="btn-action-sm btn-load" data-id="${template.id}">Carregar</button>
+                        <button class="btn-action-sm btn-delete" data-id="${template.id}">🗑️</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Só atualiza o DOM se houve mudança real (comparação simples de string)
+        // Isso evita que a lista "pisque" a cada 5 segundos se nada mudou
+        // (Nota: para simplificar, vamos substituir sempre, mas o ideal seria Diff)
+        templateListEl.innerHTML = html;
+
+        // Re-adiciona os eventos aos botões
+        document.querySelectorAll('.btn-load').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = Number(btn.dataset.id);
+                const item = lista.find(t => t.id === id);
+                if(item && confirm(`Carregar modelo "${item.nome}"?`)) {
+                    textInput.value = item.conteudo;
+                    autoSave();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = Number(btn.dataset.id);
+                if(confirm('Apagar este modelo permanentemente?')) {
+                    deletarTemplate(id);
+                }
+            });
+        });
+    }
+
+    // Botão Salvar Modelo
     if (btnSaveTemplate) {
         btnSaveTemplate.addEventListener('click', async () => {
-            const nome = prompt("Dê um nome para este modelo:");
-            if (!nome) return; // Cancelou
+            const nome = prompt("Nome do Modelo:");
+            if (!nome) return;
 
             const conteudo = textInput.value;
-            
             try {
                 const res = await fetch('/api/templates', {
                     method: 'POST',
@@ -112,10 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const novaLista = await res.json();
                 renderizarTemplates(novaLista);
-                alert("Modelo salvo com sucesso!");
-            } catch (err) {
-                alert("Erro ao salvar modelo.");
-            }
+            } catch (err) { alert("Erro ao salvar."); }
         });
     }
 
@@ -124,23 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/api/templates/${id}`, { method: 'DELETE' });
             const novaLista = await res.json();
             renderizarTemplates(novaLista);
-        } catch (err) {
-            console.error("Erro ao deletar", err);
-        }
+        } catch (err) { console.error("Erro ao deletar", err); }
     }
 
-    // Inicialização
-    if (textInput) {
-        carregarDadosIniciais();
-
-        // Gatilho do Auto-Save
-        textInput.addEventListener('input', () => {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(autoSave, 1000);
-        });
-    }
-
-    // === 3. LÓGICA DE EDIÇÃO E APRESENTAÇÃO (MANTIDA IGUAL) ===
+    // === 3. LÓGICA DE APRESENTAÇÃO (MANTIDA) ===
     
     insertButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -150,21 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const text = textInput.value;
             const selectedText = text.substring(start, end);
 
-            if (selectedText.length > 0) {
-                const replacement = `[${tag}]${selectedText}[/${tag}]`;
-                textInput.value = text.substring(0, start) + replacement + text.substring(end);
-                autoSave();
-            } else {
-                alert(`Selecione o texto para aplicar: ${tag.toUpperCase()}`);
-            }
+            const replacement = `[${tag}]${selectedText}[/${tag}]`;
+            textInput.value = text.substring(0, start) + replacement + text.substring(end);
+            autoSave();
         });
     });
 
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => { window.location.href = '/'; });
-    }
+    if (btnLogout) btnLogout.addEventListener('click', () => { window.location.href = '/'; });
 
     function formatText(text) {
+        text = text.replace(/\n/g, '<br>'); // Suporte a quebra de linha
         text = text.replace(/\[b\](.*?)\[\/b\]/g, '<strong>$1</strong>');
         text = text.replace(/\[i\](.*?)\[\/i\]/g, '<em>$1</em>');
         text = text.replace(/\[u\](.*?)\[\/u\]/g, '<u>$1</u>');
@@ -178,10 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnStart.addEventListener('click', () => {
             const rawText = textInput.value.trim();
             if (!rawText) return alert("Escreva algo primeiro!");
+            // Separa por quebra de linha dupla ou usa um separador específico se preferir
+            // Aqui usa quebra simples, mas mantém o HTML
+            phrases = rawText.split('\n\n').filter(l => l.trim() !== ''); // Usei \n\n para separar slides, ou \n se preferir linha a linha
+            if(phrases.length <= 1) phrases = rawText.split('\n').filter(l => l.trim() !== ''); // Fallback para linha a linha
 
-            phrases = rawText.split('\n').filter(line => line.trim() !== '');
             currentIndex = 0;
-
             if (phrases.length > 0) enterFullScreen();
         });
     }
@@ -211,11 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentIndex < phrases.length) {
             currentIndex++;
             updateDisplay();
-        } else {
-            exitFullScreen();
-        }
+        } else { exitFullScreen(); }
     }
-
+    
     function goPrev() {
         if (currentIndex > 0) {
             currentIndex--;
@@ -224,17 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (presentationLayer) {
-        presentationLayer.addEventListener('touchstart', e => {
-            touchStartY = e.changedTouches[0].screenY;
+        presentationLayer.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, {passive: true});
+        presentationLayer.addEventListener('touchend', e => { 
+            touchEndY = e.changedTouches[0].screenY; 
+            handleSwipe(); 
         }, {passive: true});
-
-        presentationLayer.addEventListener('touchend', e => {
-            touchEndY = e.changedTouches[0].screenY;
-            handleSwipe();
-        }, {passive: true});
-
-        presentationLayer.addEventListener('click', (e) => {
-            if (Math.abs(touchStartY - touchEndY) < 30) goNext();
+        presentationLayer.addEventListener('click', () => {
+             if (Math.abs(touchStartY - touchEndY) < 30) goNext();
         });
     }
 
@@ -244,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (diff > 0) goNext();
         else goPrev();
     }
-
+    
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) presentationLayer.style.display = 'none';
     });
