@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (!apenasLista && data.conteudo && textInput) {
+                // Só preenche se o campo estiver vazio para não sobrescrever o que você está digitando
                 if(textInput.value === "") textInput.value = data.conteudo;
             }
 
@@ -104,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-        // Atualiza HTML
         templateListEl.innerHTML = html;
 
         // Eventos dos botões da lista
@@ -130,17 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === LÓGICA DO BOTÃO SALVAR (CORRIGIDA) ===
+    // Lógica do Botão Salvar
     if (btnSaveTemplate) {
         btnSaveTemplate.addEventListener('click', async () => {
-            console.log('Botão Salvar Clicado'); // Log para debug
-
             const nome = prompt("Digite um nome para este modelo:");
-            if (!nome) return; // Se cancelar, para aqui
+            if (!nome) return;
 
             const conteudo = textInput.value;
-            
-            // Muda texto do botão para feedback
             const textoOriginal = btnSaveTemplate.textContent;
             btnSaveTemplate.textContent = "Salvando...";
 
@@ -158,13 +154,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Modelo salvo com sucesso!");
             } catch (err) {
                 console.error(err);
-                alert("Erro ao salvar. Verifique o console.");
+                alert("Erro ao salvar.");
             } finally {
                 btnSaveTemplate.textContent = textoOriginal;
             }
         });
-    } else {
-        console.error("ERRO: Botão btn-save-template não encontrado no HTML");
     }
 
     async function deletarTemplate(id) {
@@ -175,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { console.error("Erro ao deletar", err); }
     }
 
-    // === 3. EDIÇÃO E TELA CHEIA (MANTIDO) ===
+    // === 3. EDIÇÃO E TELA CHEIA (CORRIGIDO AQUI) ===
     
     insertButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -208,8 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
         btnStart.addEventListener('click', () => {
             const rawText = textInput.value.trim();
             if (!rawText) return alert("Escreva algo primeiro!");
-            phrases = rawText.split('\n\n').filter(l => l.trim() !== '');
-            if(phrases.length <= 1) phrases = rawText.split('\n').filter(l => l.trim() !== '');
+            
+            // === CORREÇÃO: DIVISÃO SIMPLES POR LINHA ===
+            // Removemos a lógica de parágrafos duplos. Agora cada Enter é um slide.
+            phrases = rawText.split('\n').filter(l => l.trim() !== '');
 
             currentIndex = 0;
             if (phrases.length > 0) enterFullScreen();
