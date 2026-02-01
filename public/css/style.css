@@ -3,7 +3,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Alterado para Poppins para garantir visual moderno na VPS */
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
 }
 
 body {
@@ -15,7 +16,7 @@ body {
     justify-content: center;
     min-height: 100vh;
     padding: 20px;
-    overflow: hidden;
+    overflow: hidden; /* Evita rolagem na tela de login */
 }
 
 /* O "Card" central */
@@ -84,7 +85,7 @@ h3 { margin-bottom: 5px; color: #fff; letter-spacing: 1px; }
     min-width: 40px;
 }
 
-/* Botões de Alinhamento (Novos) */
+/* Botões de Alinhamento */
 .btn-align {
     background: linear-gradient(to bottom, #44ccff, #0088cc);
     box-shadow: 0 4px 0 #005580;
@@ -106,6 +107,17 @@ label {
     text-transform: uppercase;
 }
 
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #2a344a;
+    background: #181f2e;
+    color: #fff;
+    outline: none;
+}
+
 textarea {
     width: 100%;
     padding: 12px 15px;
@@ -120,7 +132,7 @@ textarea {
     resize: none;
     font-family: monospace;
 }
-textarea:focus { border-color: #4e44ff; }
+textarea:focus, input:focus { border-color: #4e44ff; }
 
 /* Botão Principal */
 .btn-primary {
@@ -181,11 +193,8 @@ textarea:focus { border-color: #4e44ff; }
 .align-center { text-align: center !important; display: block; }
 .align-justify { text-align: justify !important; display: block; }
 
-/* ... MANTENHA TODO O RESTO DO ARQUIVO IGUAL ... */
-
-/* === AJUSTE MOBILE CORRIGIDO (PREENCHIMENTO TOTAL) === */
+/* === AJUSTE MOBILE (PREENCHIMENTO TOTAL) === */
 @media screen and (max-width: 768px) and (orientation: portrait) {
-    /* Esconde a estrutura padrão do container pai para não interferir */
     #presentation-layer {
         display: none; 
         align-items: unset;
@@ -195,7 +204,6 @@ textarea:focus { border-color: #4e44ff; }
     }
     
     #display-text {
-        /* FIXED garante que ele ignore o container pai e use a janela inteira */
         position: fixed; 
         top: 50%;
         left: 50%;
@@ -203,33 +211,26 @@ textarea:focus { border-color: #4e44ff; }
         /* Gira 90 graus */
         transform: translate(-50%, -50%) rotate(90deg);
         
-        /* AQUI ESTÁ A CORREÇÃO:
-           1. width: 100vh -> Obriga a caixa de texto ter a altura TOTAL do celular.
-           2. max-width: none -> Remove limites que o desktop impõe. */
+        /* Força a altura do texto a ser a altura da tela do celular */
         width: 100vh;
         max-width: none !important;
         height: auto;
         
-        /* Padding: 0 nas laterais (que viram altura) e 4vh nas pontas (topo/fundo do cel)
-           Isso é a margem de segurança para a câmera/notch */
+        /* Margem segura para notch/câmera */
         padding: 0 4vh; 
         
-        /* Tamanho da fonte calibrado para encher bem */
+        /* Fonte grande */
         font-size: 10vw; 
         line-height: 1.2; 
         
         text-align: center;
         margin: 0;
         white-space: normal;
-        
-        /* Garante que o padding não aumente o tamanho total */
         box-sizing: border-box; 
     }
     
-    /* Ajuste para as tags de alinhamento funcionarem no modo girado */
     .align-center { text-align: center; display: block; }
     
-    /* No Justify do mobile, usamos text-align-last center para a última linha não ficar feia */
     .align-justify { 
         text-align: justify; 
         text-align-last: center; 
