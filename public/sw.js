@@ -1,4 +1,6 @@
-const CACHE_NAME = 'app-frases-v1';
+// ATENÇÃO: Mudei para v2 para forçar a atualização do design no celular do usuário
+const CACHE_NAME = 'app-frases-v2';
+
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -9,44 +11,41 @@ const ASSETS_TO_CACHE = [
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap'
 ];
 
-// 1. Instalação do Service Worker
+// 1. Instalação: Baixa os arquivos para deixar offline
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Instalando...');
+  console.log('[Service Worker] Instalando v2...');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Caching arquivos estáticos');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting(); // Força o SW a ativar imediatamente
+  self.skipWaiting(); // Força a ativação imediata
 });
 
-// 2. Ativação e Limpeza de Caches Antigos
+// 2. Ativação: Limpa a versão antiga (v1) para não mostrar o design velho
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Ativando...');
+  console.log('[Service Worker] Ativando e limpando caches antigos...');
   event.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[Service Worker] Removendo cache antigo', key);
+            console.log('[Service Worker] Removendo cache:', key);
             return caches.delete(key);
           }
         })
       );
     })
   );
-  self.clients.claim(); // Controla a página imediatamente
+  self.clients.claim();
 });
 
-// 3. Interceptação de Requisições (Estratégia: Cache First, falling back to Network)
+// 3. Busca: Tenta o Cache primeiro, se não tiver, vai na Internet
 self.addEventListener('fetch', (event) => {
-  // Ignora requisições que não sejam GET ou sejam externas (analytics, etc)
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Se achou no cache, retorna. Se não, busca na rede.
       return cachedResponse || fetch(event.request);
     })
   );

@@ -29,6 +29,10 @@
             
             <button type="submit" class="btn-primary">ENTRAR</button>
         </form>
+
+        <button id="bt-instalar" class="btn-logout" style="display: none; margin-top: 15px; border: 1px dashed #4e44ff; color: #4e44ff; font-weight: bold;">
+            📲 INSTALAR APLICATIVO
+        </button>
     </div>
     
     <script>
@@ -37,15 +41,37 @@
     </script>
 
     <script>
+        let deferredPrompt; // Guarda o evento de instalação
+        const installBtn = document.getElementById('bt-instalar');
+
+        // 1. Escuta se o navegador autoriza a instalação
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // Impede o popup padrão feio
+            deferredPrompt = e; // Salva o evento
+            installBtn.style.display = 'block'; // Mostra nosso botão personalizado
+            console.log('App pronto para instalar!');
+        });
+
+        // 2. O que acontece ao clicar no botão Instalar
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt(); // Mostra a pergunta do sistema
+                const { outcome } = await deferredPrompt.userChoice; // Espera a resposta
+                console.log(`Usuário escolheu: ${outcome}`);
+                deferredPrompt = null; // Limpa
+                installBtn.style.display = 'none'; // Esconde o botão
+            }
+        });
+
+        // 3. Registra o Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('SW registrado com sucesso:', registration.scope);
+                    .then(reg => {
+                        console.log('SW Registrado na versão 2');
+                        reg.update(); // Tenta atualizar o cache imediatamente
                     })
-                    .catch(error => {
-                        console.log('Falha ao registrar SW:', error);
-                    });
+                    .catch(err => console.log('Erro no SW:', err));
             });
         }
     </script>
