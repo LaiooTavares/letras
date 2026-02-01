@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=5">
 
     <style>
         .btn-save-model {
@@ -26,56 +26,40 @@
             margin-bottom: 20px;
             transition: transform 0.1s;
         }
-        .btn-save-model:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 transparent;
+        .btn-save-model:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+        
+        .template-area { border-top: 1px solid #2a344a; padding-top: 15px; text-align: left; margin-bottom: 10px; }
+        .template-list { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; margin-top: 10px; }
+        
+        .template-item { 
+            background: #181f2e; 
+            padding: 10px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border: 1px solid #2a344a; 
         }
-
-        .template-area {
-            border-top: 1px solid #2a344a;
-            padding-top: 15px;
-            text-align: left;
-            margin-bottom: 10px;
+        
+        .template-name { 
+            font-size: 0.85rem; 
+            color: #fff; 
+            flex-grow: 1; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            margin-right: 10px; 
         }
-
-        .template-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        .template-item {
-            background: #181f2e;
-            padding: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #2a344a;
-        }
-
-        .template-name {
-            font-size: 0.85rem;
-            color: #fff;
-            flex-grow: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-right: 10px;
-        }
-
-        .btn-action-sm {
-            padding: 6px 10px;
-            font-size: 0.7rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            margin-left: 5px;
-            font-weight: bold;
-            color: white;
+        
+        .btn-action-sm { 
+            padding: 6px 10px; 
+            font-size: 0.7rem; 
+            border-radius: 4px; 
+            border: none; 
+            cursor: pointer; 
+            margin-left: 5px; 
+            font-weight: bold; 
+            color: white; 
         }
         .btn-load { background: #4e44ff; }
         .btn-delete { background: #ff4444; }
@@ -108,10 +92,9 @@
         </div>
 
         <label>Texto da Apresentação</label>
-        <textarea id="text-input" placeholder="Exemplo:&#10;[c]Título Centralizado[/c]&#10;[j]Texto estendido até as bordas[/j]&#10;Jesus é o [yellow]Caminho[/yellow]"></textarea>
+        <textarea id="text-input" placeholder="Exemplo:&#10;[c]Título Centralizado[/c]&#10;Jesus é o [yellow]Caminho[/yellow]"></textarea>
         
         <button id="btn-start" class="btn-primary">INICIAR TELA CHEIA</button>
-        
         <button id="btn-save-template" class="btn-save-model">💾 SALVAR COMO MODELO</button>
 
         <div class="template-area">
@@ -131,6 +114,6 @@
         </div>
     </div>
 
-    <script src="/js/script.js"></script>
+    <script src="/js/script.js?v=5"></script>
 </body>
 </html>

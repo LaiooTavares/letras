@@ -1,4 +1,3 @@
-// Referencia: server.js
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -10,12 +9,12 @@ const PORT = process.env.PORT || 3000;
 // === CONFIGURAÇÃO DO BANCO DE DADOS ===
 const DB_FILE = path.join(__dirname, 'banco-dados.json');
 
-// Inicializa o banco com estrutura nova (Conteúdo atual + Lista de Templates)
+// Inicializa o banco com estrutura correta se não existir
 if (!fs.existsSync(DB_FILE)) {
     try {
         const initialData = { 
             conteudo: "", 
-            templates: [] // Lista vazia para guardar os salvos
+            templates: [] 
         };
         fs.writeFileSync(DB_FILE, JSON.stringify(initialData), 'utf-8');
         console.log('🆕 Banco de dados criado.');
@@ -23,12 +22,6 @@ if (!fs.existsSync(DB_FILE)) {
         console.error('Erro ao criar banco:', e);
     }
 }
-
-// === MIDDLEWARES ===
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-const publicPath = path.join(__dirname, 'public');
-app.use(express.static(publicPath));
 
 // === FUNÇÕES AUXILIARES ===
 function lerBanco() {
@@ -41,6 +34,13 @@ function lerBanco() {
 function salvarBanco(dados) {
     fs.writeFileSync(DB_FILE, JSON.stringify(dados, null, 2), 'utf-8');
 }
+
+// === MIDDLEWARES ===
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
 
 // === ROTAS DA API ===
 
@@ -57,16 +57,15 @@ app.post('/api/salvar-texto', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-// 3. Criar novo Template
+// 3. Criar novo Template (AQUI ESTÁ A LÓGICA DO BOTÃO SALVAR)
 app.post('/api/templates', (req, res) => {
     const { nome, conteudo } = req.body;
     const db = lerBanco();
     
-    // Garante que existe o array
     if (!db.templates) db.templates = [];
 
     const novoTemplate = {
-        id: Date.now(), // ID único baseado no tempo
+        id: Date.now(), // ID único
         nome: nome || 'Sem nome',
         conteudo: conteudo
     };
@@ -92,6 +91,11 @@ app.delete('/api/templates/:id', (req, res) => {
 // === ROTAS PADRÃO ===
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.use('/', routes);
+
+// Rota 404
+app.use((req, res) => {
+    res.status(404).send(`Página não encontrada: ${req.url}`);
+});
 
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta: ${PORT}`);
