@@ -13,13 +13,63 @@
     <link rel="manifest" href="/manifest.json">
     
     <meta name="theme-color" content="#000000">
-    
     <meta name="mobile-web-app-capable" content="yes">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <link rel="apple-touch-icon" href="/img/icon-192.png">
+
+    <style>
+        .template-area {
+            margin-top: 20px;
+            border-top: 1px solid #2a344a;
+            padding-top: 15px;
+            text-align: left;
+        }
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .template-item {
+            background: #181f2e;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #2a344a;
+        }
+        .template-name {
+            font-size: 0.85rem;
+            color: #fff;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        .btn-action-sm {
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .btn-load { background: #4e44ff; color: white; }
+        .btn-delete { background: #ff4444; color: white; }
+        .btn-save-model {
+            background: #28a745; 
+            width: 100%; 
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -31,14 +81,14 @@
         <form action="/login" method="POST">
             <label for="senha">Senha de Acesso</label>
             <input type="password" id="senha" name="senha" placeholder="••••••••" required>
-            
             <button type="submit" class="btn-primary">ENTRAR</button>
         </form>
 
         <button id="bt-instalar" class="btn-logout" style="display: none; margin-top: 15px; border: 1px dashed #4e44ff; color: #4e44ff; font-weight: bold;">
             📲 INSTALAR APLICATIVO
         </button>
-    </div>
+        
+        </div>
     
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -46,37 +96,27 @@
     </script>
 
     <script>
-        let deferredPrompt; // Guarda o evento de instalação
+        let deferredPrompt;
         const installBtn = document.getElementById('bt-instalar');
 
-        // 1. Escuta se o navegador autoriza a instalação
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); // Impede o popup padrão feio do navegador
-            deferredPrompt = e; // Salva o evento para usar no clique
-            installBtn.style.display = 'block'; // Torna o botão visível
-            console.log('App pronto para instalar!');
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
         });
 
-        // 2. O que acontece ao clicar no botão Instalar
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                deferredPrompt.prompt(); // Mostra a pergunta oficial do sistema
-                const { outcome } = await deferredPrompt.userChoice; // Espera a resposta do usuário
-                console.log(`Usuário escolheu: ${outcome}`);
-                deferredPrompt = null; // Limpa a variável
-                installBtn.style.display = 'none'; // Esconde o botão após a ação
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
             }
         });
 
-        // 3. Registra o Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => {
-                        console.log('SW Registrado com sucesso.');
-                        reg.update(); // Tenta atualizar o cache imediatamente para pegar mudanças
-                    })
-                    .catch(err => console.log('Erro ao registrar SW:', err));
+                navigator.serviceWorker.register('/sw.js').then(reg => reg.update());
             });
         }
     </script>

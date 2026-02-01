@@ -10,6 +10,76 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .btn-save-model {
+            background: linear-gradient(to bottom, #28a745, #1e7e34);
+            box-shadow: 0 4px 0 #155724;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.1s;
+        }
+        .btn-save-model:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        .template-area {
+            border-top: 1px solid #2a344a;
+            padding-top: 15px;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .template-item {
+            background: #181f2e;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #2a344a;
+        }
+
+        .template-name {
+            font-size: 0.85rem;
+            color: #fff;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+        }
+
+        .btn-action-sm {
+            padding: 6px 10px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-load { background: #4e44ff; }
+        .btn-delete { background: #ff4444; }
+    </style>
 </head>
 <body>
 
@@ -41,6 +111,16 @@
         <textarea id="text-input" placeholder="Exemplo:&#10;[c]Título Centralizado[/c]&#10;[j]Texto estendido até as bordas[/j]&#10;Jesus é o [yellow]Caminho[/yellow]"></textarea>
         
         <button id="btn-start" class="btn-primary">INICIAR TELA CHEIA</button>
+        
+        <button id="btn-save-template" class="btn-save-model">💾 SALVAR COMO MODELO</button>
+
+        <div class="template-area">
+            <label>MEUS MODELOS SALVOS:</label>
+            <div id="template-list" class="template-list">
+                <p style="font-size: 0.8rem; color: #666; text-align: center;">Carregando modelos...</p>
+            </div>
+        </div>
+
         <button id="btn-logout" class="btn-logout">Sair do App</button>
     </div>
 
